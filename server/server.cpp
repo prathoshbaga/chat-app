@@ -1,3 +1,6 @@
+/*
+server code
+*/
 #include "server.h"
 #include <iostream>
 #include <cstring>

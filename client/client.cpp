@@ -1,3 +1,6 @@
+/*
+client code
+*/
 #include "client.h"
 #include <iostream>
 #include <cstring>
