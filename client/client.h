@@ -2,7 +2,6 @@
 #define CLIENT_H
 
 #include <string>
-//#include <pthread.h>
 #include <memory>
 #include <set>
 #include <netinet/in.h>
@@ -18,7 +17,6 @@ public:
 
 private:
     int m_clientSocket;
-    //sockaddr_in serverAddr;
     std::string m_username;
     pthread_mutex_t m_messageMutex;
 
