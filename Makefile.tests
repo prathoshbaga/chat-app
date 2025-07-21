@@ -1,0 +1,75 @@
+# Compiler and Flags
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -pthread
+
+# Directories
+BUILD_DIR = build
+GTEST_DIR = $(BUILD_DIR)/gtest
+GTEST_SRC = $(GTEST_DIR)/googletest
+GTEST_BUILD = $(GTEST_DIR)/build
+TEST_DIR = tests
+SERVER_DIR = server
+CLIENT_DIR = client
+NETWORK_SOCKET_DIR = network_socket
+
+# Test Files
+SERVER_TEST_SRC = $(TEST_DIR)/server_test.cpp $(SERVER_DIR)/server.cpp $(TEST_DIR)/test_main.cpp
+CLIENT_TEST_SRC = $(TEST_DIR)/client_test.cpp $(CLIENT_DIR)/client.cpp $(TEST_DIR)/test_main.cpp
+
+# Test Binaries
+SERVER_TEST_BIN = $(BUILD_DIR)/server_test
+CLIENT_TEST_BIN = $(BUILD_DIR)/client_test
+
+# Google Test Libraries (Built locally)
+GTEST_LIB = $(GTEST_BUILD)/lib/libgtest.a $(GTEST_BUILD)/lib/libgtest_main.a
+GTEST_INCLUDE = $(GTEST_SRC)/include
+
+# Google Mock Libraries and Includes
+GMOCK_LIB = $(GTEST_BUILD)/lib/libgmock.a
+GMOCK_INCLUDE = $(GTEST_SRC)/googlemock/include
+
+# Targets
+.PHONY: all clean build_tests run_tests gtest
+
+all: build_tests
+
+# to build Google Test library by cloning 
+gtest:
+	mkdir -p $(GTEST_DIR)
+	if [ ! -d "$(GTEST_SRC)" ]; then \
+		cd $(GTEST_DIR) && git clone https://github.com/google/googletest.git googletest; \
+	fi
+	mkdir -p $(GTEST_BUILD)
+	cd $(GTEST_BUILD) && cmake -DCMAKE_BUILD_TYPE=Release ../googletest
+	cd $(GTEST_BUILD) && make
+
+build_tests: gtest
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) \
+	-I$(PWD) \
+	-I$(PWD)/$(SERVER_DIR) \
+	-I$(PWD)/$(CLIENT_DIR) \
+	-I$(PWD)/$(NETWORK_SOCKET_DIR) \
+	-I$(PWD)/build/gtest/googletest/googletest/include \
+	-I$(PWD)/build/gtest/googletest/googlemock/include \
+	-o $(SERVER_TEST_BIN) $(SERVER_TEST_SRC) $(GTEST_LIB) $(GMOCK_LIB) -pthread
+
+	$(CXX) $(CXXFLAGS) \
+	-I$(PWD) \
+	-I$(PWD)/$(SERVER_DIR) \
+	-I$(PWD)/$(CLIENT_DIR) \
+	-I$(PWD)/$(NETWORK_SOCKET_DIR) \
+	-I$(PWD)/build/gtest/googletest/googletest/include \
+	-I$(PWD)/build/gtest/googletest/googlemock/include \
+	-o $(CLIENT_TEST_BIN) $(CLIENT_TEST_SRC) $(GTEST_LIB) $(GMOCK_LIB) -pthread
+
+# to run test binaries
+run_tests: build_tests
+	@echo "Running Server Tests..."
+	@./$(SERVER_TEST_BIN)
+	@echo "Running Client Tests..."
+	@./$(CLIENT_TEST_BIN)
+
+# to cleanup the build folder
+clean:
+	rm -rf $(BUILD_DIR)
