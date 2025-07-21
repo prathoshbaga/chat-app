@@ -1,3 +1,6 @@
+/*
+main.cpp for client
+*/
 #include "client.h"
 #include <iostream>
 #include <thread>

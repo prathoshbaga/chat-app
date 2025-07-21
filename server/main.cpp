@@ -1,3 +1,6 @@
+/*
+main.cpp for server
+*/
 #include "server.h"
 #include <iostream>
 #include <memory>
